@@ -1,0 +1,29 @@
+.thread:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.tag {
+  z-index: 100;
+}
+
+.thread {
+  z-index: 0;
+}
+
+.tag:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.footer {
+  margin-top: 50px;
+}
+
+.column.is-one-third {
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.content {
+  white-space: pre-line;
+}

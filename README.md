@@ -5,7 +5,6 @@
 
 * Official IPNS link: https://ipfs.io/ipns/QmNjaqFp72m2V4QqkMXULitqfaKu5T5dF3Af5FyRhRQLSX
 * Locally: http://localhost:8080/ipns/QmNjaqFp72m2V4QqkMXULitqfaKu5T5dF3Af5FyRhRQLSX
-* DNS: https://tree-talk.io
 
 ## Installing
 

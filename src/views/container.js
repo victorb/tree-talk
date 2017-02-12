@@ -31,8 +31,7 @@ export default class ContainerView extends Component {
       threads: [],
       posts: [],
       username: initialUsername,
-      numberOfPeers: 0,
-      numberOfMessages: 0
+      numberOfPeers: 0
     }
   }
   componentDidMount () {
@@ -45,9 +44,6 @@ export default class ContainerView extends Component {
 
         node.pubsub.subscribe('tree-talk', (msg) => {
           const isFromThisNode = msg.from === getIDFromNode(node)
-          if (!isFromThisNode) {
-            this.setState({numberOfMessages: this.state.numberOfMessages + 1})
-          }
           const hash = msg.data.toString()
           node.files.cat(hash, (err, stream) => {
             if (err) throw err
@@ -275,12 +271,6 @@ export default class ContainerView extends Component {
                 <div>
                   <p className='heading'>Peers</p>
                   <p className='title'>{this.state.numberOfPeers}</p>
-                </div>
-              </div>
-              <div className='level-item has-text-centered'>
-                <div>
-                  <p className='heading'>Received Pings</p>
-                  <p className='title'>{this.state.numberOfMessages}</p>
                 </div>
               </div>
               <div className='level-item has-text-centered'>

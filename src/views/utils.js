@@ -9,9 +9,9 @@ export const bindValueToState = function (stateKey) {
 export const getIDFromNode = (node) => node._peerInfo.id._idB58String
 
 export const createNode = (callback) => {
-  // Create a new repository for IPFS in a random path always
-  const isProd = process.env.NODE_ENV === 'production'
-  const repoPath = isProd ? '/ipfs' : '/ipfs/' + Math.random()
+  // const isProd = process.env.NODE_ENV === 'production'
+  // const repoPath = isProd ? '/ipfs' : '/ipfs/' + Math.random()
+  const repoPath = '/ipfs/' + Math.random()
 
   const node = new IPFS(repoPath)
 

@@ -44,7 +44,10 @@ export default class ContainerView extends Component {
         this.setState({node, nodeStatus: NODE_STATUS_RUNNING})
 
         node.pubsub.subscribe('tree-talk', (msg) => {
-          this.setState({numberOfMessages: this.state.numberOfMessages + 1})
+          const isFromThisNode = msg.from === getIDFromNode(node)
+          if (!isFromThisNode) {
+            this.setState({numberOfMessages: this.state.numberOfMessages + 1})
+          }
           const hash = msg.data.toString()
           node.files.cat(hash, (err, stream) => {
             if (err) throw err
@@ -59,7 +62,7 @@ export default class ContainerView extends Component {
                 console.log(msg, parsedData)
               } else {
                 parsedData.hash = hash
-                if (parsedData.threads) { // it's a users collection of threads
+                if (parsedData.threads && !isFromThisNode) { // it's a users collection of threads
                   const promises = parsedData.threads.map((t) => {
                     return new Promise((resolve, reject) => {
                       node.files.cat(t, (err, stream) => {
@@ -83,7 +86,7 @@ export default class ContainerView extends Component {
                   })
                   return
                 }
-                if (parsedData.posts) { // it's a users collection of posts
+                if (parsedData.posts && !isFromThisNode) { // it's a users collection of posts
                   const promises = parsedData.posts.map((p) => {
                     return new Promise((resolve, reject) => {
                       node.files.cat(p, (err, stream) => {
@@ -124,7 +127,11 @@ export default class ContainerView extends Component {
           })
         })
 
+        const peersAtLeastOne = this.state.numberOfPeers === 0 ? 1 : this.state.numberOfPeers
+        const publishTimeout = 1000 * peersAtLeastOne
+
         const publishThreads = () => {
+          console.log('publishing threads')
           if (this.state.threads.length > 0) {
             const myID = getIDFromNode(node)
             // TODO only post users threads or all posts???
@@ -141,12 +148,14 @@ export default class ContainerView extends Component {
               node.pubsub.publish('tree-talk', new Buffer(hash))
             })
           }
-          setInterval(() => { // publish list of threads
+          setTimeout(() => { // publish list of threads
             publishThreads()
-          }, 500 * this.state.numberOfPeers)
+          }, publishTimeout)
         }
+        publishThreads()
 
         const publishPosts = () => {
+          console.log('publishing posts')
           if (this.state.posts.length > 0) {
             const myID = getIDFromNode(node)
             // TODO only post users threads or all posts???
@@ -163,10 +172,11 @@ export default class ContainerView extends Component {
               node.pubsub.publish('tree-talk', new Buffer(hash))
             })
           }
-          setInterval(() => { // publish list of threads
+          setTimeout(() => { // publish list of threads
             publishPosts()
-          }, 500 * this.state.numberOfPeers)
+          }, publishTimeout)
         }
+        publishPosts()
 
         setInterval(() => {
           node.swarm.peers((err, peers) => {

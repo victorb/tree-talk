@@ -143,7 +143,7 @@ export default class ContainerView extends Component {
           }
           setInterval(() => { // publish list of threads
             publishThreads()
-          }, 1000 * this.state.numberOfPeers)
+          }, 500 * this.state.numberOfPeers)
         }
 
         const publishPosts = () => {
@@ -165,7 +165,7 @@ export default class ContainerView extends Component {
           }
           setInterval(() => { // publish list of threads
             publishPosts()
-          }, 1000 * this.state.numberOfPeers)
+          }, 500 * this.state.numberOfPeers)
         }
 
         setInterval(() => {

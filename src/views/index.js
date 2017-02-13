@@ -11,10 +11,8 @@ export default class IndexView extends Component {
   }
   render () {
     const posts = _.groupBy(this.props.posts, 'threadID')
-    console.log('posts', posts)
     let threads = this.props.threads.map((thread) => {
       const thisThreadsPosts = posts[thread.hash]
-      console.log('thisThreadsPosts', thisThreadsPosts)
       let postLen = 0
       if (thisThreadsPosts) {
         postLen = thisThreadsPosts.length

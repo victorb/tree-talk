@@ -1,6 +1,15 @@
 # Tree-Talk
 > A tree in the merkle-forest where you can just hang around and talk
 
+## What is this?
+
+Tree-Talk is a forum that works over IPFS, mainly the pubsub part. There is no
+servers involved in sending the threads/posts to other users but there is a
+signaling server for helping peers to discover each others.
+
+Tree-Talks data is completely distributed among the peers that are using the
+application, with no central storage/database for threads and posts.
+
 ## Running
 
 * Official IPNS link: https://ipfs.io/ipns/QmNjaqFp72m2V4QqkMXULitqfaKu5T5dF3Af5FyRhRQLSX

@@ -14,8 +14,8 @@ application, with no central storage/database for threads and posts.
 
 ## Running
 
-* Official IPNS link: https://ipfs.io/ipns/QmNjaqFp72m2V4QqkMXULitqfaKu5T5dF3Af5FyRhRQLSX
-* Locally: http://localhost:8080/ipns/QmNjaqFp72m2V4QqkMXULitqfaKu5T5dF3Af5FyRhRQLSX
+* Official IPFS link: https://ipfs.io/ipfs/QmdsQExVDxp2EgERDZFn2Q7Q6Ldi3uH4XSpQTu4L7aUeTU/#/
+* Locally: http://localhost:8080/ipfs/QmdsQExVDxp2EgERDZFn2Q7Q6Ldi3uH4XSpQTu4L7aUeTU/#/
 
 ## Installing
 

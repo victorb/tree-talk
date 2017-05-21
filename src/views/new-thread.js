@@ -3,6 +3,8 @@ import { IndexLink, hashHistory } from 'react-router'
 
 import { bindValueToState, getIDFromNode } from './utils.js'
 
+import { CHANNEL } from '../constants.js'
+
 export default class NewThreadView extends Component {
   constructor (props) {
     super(props)
@@ -26,12 +28,18 @@ export default class NewThreadView extends Component {
       tags: this.state.currentTags.split(','),
       created_at: new Date()
     }
-    const msgToSend = new Buffer(JSON.stringify(msg))
-    this.props.node.files.add(msgToSend, (err, res) => {
+    console.log('creating thread', msg)
+    // const msgToSend = new Buffer(JSON.stringify(msg))
+    // this.props.node.files.add(msgToSend, (err, res) => {
+    this.props.node.dag.put(msg, {format: 'dag-cbor'}, (err, dag) => {
       if (err) throw err
-      this.props.node.pubsub.publish('tree-talk', new Buffer(res[0].hash), () => {
+      const hash = dag.toBaseEncodedString()
+      console.log('thread hash', hash)
+      this.props.node.pubsub.publish(CHANNEL, new Buffer(hash), (err) => {
+        if (err) throw err
+        console.log('published')
         this.setState({currentSubject: '', currentBody: '', creating: false, currentTags: ''})
-        hashHistory.push('/threads/' + res[0].hash)
+        hashHistory.push('/threads/' + hash)
       })
     })
   }

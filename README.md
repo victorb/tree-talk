@@ -61,6 +61,34 @@ on IPNS.
 
 You can then visit `https://ipfs.io/ipfs/:hash` or `https://ipfs.io/ipns/:ipnfs-name`
 
+## Architecture
+
+Tree-Talk is using the pubsub and DAG API in js-ipfs to publish and retrieve content.
+
+It publishes resources in a pubsub channel and also listens on the same channel.
+
+There is also a implementation of a caching server who listens to a pubsub channel
+and reshares all the content it can find.
+
+## Open Problems
+
+- Spam - Anyone can publish events on a pubsub channel and spam the network
+	- Possible Solutions:
+		- Every client keeps track of how many threads/posts they received from another
+		client and if 2 posts > 1 minute, put the client on cooldown
+
+## Testing
+
+Should include a acceptance testing suite for making sure everything is always
+working as it should.
+
+- Start signal server
+- Start browser 1
+- Start browser 2
+
+Scenarios:
+- Browser 1 & 2 are connected, showing "1 peer" each
+
 ## License
 
 MIT 2017 - Victor Bjelkholm

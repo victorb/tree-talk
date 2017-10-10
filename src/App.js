@@ -10,6 +10,7 @@ import SettingsView from './views/settings.js'
 
 class App extends Component {
   render () {
+    console.log('hello')
     return <Router history={hashHistory}>
       <Route path='/' component={ContainerView}>
         <IndexRoute component={IndexView} />

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import _ from 'lodash'
+import _ from 'lodash'
 import { IndexLink } from 'react-router'
 
 import IdenticonJS from 'identicon.js'
@@ -25,13 +25,16 @@ export default class ThreadView extends Component {
     const thread = this.props.resources[this.props.params.hash]
     // const thread = _.find(this.props.threads, {hash: this.props.params.hash})
     const msg = {
-      from: {
-        id: getIDFromNode(this.props.node),
-        username: this.props.username
-      },
-      thread: {'/': this.props.params.hash },
-      body: this.state.currentBody,
-      created_at: new Date()
+      type: 'COMMENT',
+      comment: {
+        from: {
+          id: getIDFromNode(this.props.node),
+          username: this.props.username
+        },
+        thread: this.props.params.hash,
+        body: this.state.currentBody,
+        created_at: new Date()
+      }
     }
     this.props.node.dag.put(msg, {format: 'dag-cbor'}, (err, dag) => {
       if (err) throw err
@@ -42,37 +45,41 @@ export default class ThreadView extends Component {
   }
   render () {
     const thread = this.props.resources[this.props.params.hash]
+    console.log(this.props.resources)
     if (thread) {
       console.log('rendering', thread)
+      const posts = _.filter(this.props.resources, (r) => {
+        return r.thread && r.thread === this.props.params.hash
+      })
       // const posts = _.groupBy(this.props.posts, 'threadID')[this.props.params.hash]
-      // let postsToRender = null
-      // if (posts) {
-      //   postsToRender = posts.map((post) => {
-      //     const avatarData = new IdenticonJS(reverse(post.from.id), 50)
-      //     return <div className='box' key={post.hash}>
-      //       <div className='columns'>
-      //         <div className='column is-one-third'>
-      //           <article className='media'>
-      //             <div className='media-left'>
-      //               <img width={50} height={50} src={'data:image/png;base64,' + avatarData} />
-      //             </div>
-      //             <div className='media-content'>
-      //               <div className='content'>
-      //                 <div>Username: {post.from.username}</div>
-      //                 <div>Date: {post.created_at}</div>
-      //               </div>
-      //             </div>
-      //           </article>
-      //         </div>
-      //         <div className='column'>
-      //           <div className='content'>
-      //             {post.body}
-      //           </div>
-      //         </div>
-      //       </div>
-      //     </div>
-      //   })
-      // }
+      let postsToRender = null
+      if (posts) {
+        postsToRender = posts.map((post) => {
+          const avatarData = new IdenticonJS(reverse(post.from.id), 50)
+          return <div className='box' key={post.hash}>
+            <div className='columns'>
+              <div className='column is-one-third'>
+                <article className='media'>
+                  <div className='media-left'>
+                    <img width={50} height={50} src={'data:image/png;base64,' + avatarData} />
+                  </div>
+                  <div className='media-content'>
+                    <div className='content'>
+                      <div>Username: {post.from.username}</div>
+                      <div>Date: {post.created_at.toString()}</div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div className='column'>
+                <div className='content'>
+                  {post.body}
+                </div>
+              </div>
+            </div>
+          </div>
+        })
+      }
       const avatarData = new IdenticonJS(reverse(thread.from.id), 50)
       return <div className='container'>
         <p className='control'>
@@ -104,9 +111,7 @@ export default class ThreadView extends Component {
             </div>
           </div>
         </div>
-        {/*
-          {postsToRender}
-        */}
+        {postsToRender}
         <div className='box'>
           <div className='column is-half'>
             <label className='label' htmlFor='body'>Reply</label>

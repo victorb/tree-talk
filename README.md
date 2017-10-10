@@ -77,6 +77,13 @@ and reshares all the content it can find.
 		- Every client keeps track of how many threads/posts they received from another
 		client and if 2 posts > 1 minute, put the client on cooldown
 
+- Messaging
+  - Should always one message per second
+
+- Authenticity
+  - All messages should be signed
+    - UI needs to show if message is signed or not
+
 ## Testing
 
 Should include a acceptance testing suite for making sure everything is always

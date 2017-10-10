@@ -4,6 +4,8 @@ import _ from 'lodash'
 export default class State extends Component {
   render () {
     const { resources, peers } = this.props
+    const threads = _.filter(resources, t => t.subject)
+    const replies = _.filter(resources, t => !t.subject)
 
     return <nav className='level'>
       <div className='level-item has-text-centered'>
@@ -15,21 +17,20 @@ export default class State extends Component {
       <div className='level-item has-text-centered'>
         <div>
           <p className='heading'>Threads</p>
-          <p className='title'>{Object.keys(resources).length}</p>
+          <p className='title'>{threads.length}</p>
         </div>
       </div>
       <div className='level-item has-text-centered'>
         <div>
           <p className='heading'>Replies</p>
-          <p className='title'>{Object.keys(resources).length}</p>
+          <p className='title'>{replies.length}</p>
         </div>
       </div>
       <div className='level-item has-text-centered'>
         <div>
           <p className='heading'>Tags</p>
           <p className='title'>{Object.keys(resources).reduce((c, p) => {
-            console.log(resources)
-            return c + resources[p].tags.length
+            return resources[p].tags ? c + resources[p].tags.length : c
           }, 0)}</p>
         </div>
       </div>

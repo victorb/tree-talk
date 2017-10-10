@@ -1,5 +1,5 @@
 import IPFS from 'ipfs'
-import { SIGNAL_SERVER } from '../constants.js'
+// import { SIGNAL_SERVER } from '../constants.js'
 
 export const bindValueToState = function (stateKey) {
   return (e) => {
@@ -22,23 +22,24 @@ export const createNode = (repo, callback) => {
     EXPERIMENTAL: { // enable experimental features
       pubsub: true
     },
-    config: { // overload the default config
-      // Discovery: {
-      //   webRTCStar: {
-      //     Enabled: true
-      //   }
-      // },
-      Addresses: {
-        Swarm: [
-          // '/libp2p-webrtc-star/dns4/star-signal.cloud.ipfs.team/wss'
-          SIGNAL_SERVER,
-          // '/ip4/127.0.0.1/tcp/4000/ws'
-        ]
-      }
-    }
+    // config: { // overload the default config
+    //   // Discovery: {
+    //   //   webRTCStar: {
+    //   //     Enabled: true
+    //   //   }
+    //   // },
+    //     Swarm: [
+    //       // '/libp2p-webrtc-star/dns4/star-signal.cloud.ipfs.team/wss'
+    //       SIGNAL_SERVER,
+    //       // '/ip4/127.0.0.1/tcp/4000/ws'
+    //     ]
+    //   }
+    // }
   })
 
   node.on('start', () => {
+    // should hardcode to tree-talk signal server
+    node.swarm.connect('/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmWq2ugzXDeTzW9GTYgdo3k6QUDmC1vnZcgjHhWtMxHYct')
     console.log('node started')
     //node.config.get((err, config) => {
     //  if (err) return callback(err)

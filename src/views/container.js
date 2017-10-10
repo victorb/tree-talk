@@ -3,7 +3,7 @@ import { IndexLink } from 'react-router'
 import _ from 'lodash'
 
 /* getIDFromNode */
-import {createNode} from './utils.js'
+import {createNode, getIDFromNode } from './utils.js'
 import {CHANNEL} from '../constants.js'
 import Stats from './stats'
 
@@ -39,7 +39,6 @@ export default class ContainerView extends Component {
   componentDidMount () {
     createNode('/ipfs-' + Math.floor(Math.random() * 100), (err, node) => {
       if (err) {
-        console.log('got error', err)
         this.setState({nodeStatus: NODE_STATUS_ERROR})
       } else {
         window.node = node
@@ -48,135 +47,53 @@ export default class ContainerView extends Component {
         node.pubsub.subscribe(CHANNEL, (msg) => {
           // const isFromThisNode = msg.from === getIDFromNode(node)
           const hash = msg.data.toString()
-          console.log(msg)
 
           node.dag.get(hash, (err, dag) => {
             if (err) throw err
-            const newResources = Object.assign({}, this.state.resources)
-            newResources[hash] = dag.value
-            this.setState({resources: newResources})
+            console.log('## Received')
+            console.log(dag.value)
+            // if (dag.value.subject) {
+            //   const newResources = Object.assign({}, this.state.resources)
+            //   newResources[hash] = dag.value
+            //   this.setState({resources: newResources})
+            // } else {
+            // }
+            if (dag.value.type === 'STATE') {
+              const newResources = Object.assign({}, this.state.resources, dag.value.hashes)
+              this.setState({resources: newResources})
+            }
+            if (dag.value.type === 'COMMENT') {
+              const newResources = Object.assign({}, this.state.resources)
+              newResources[hash] = dag.value.comment
+              this.setState({resources: newResources})
+            }
+            if (dag.value.type === 'THREAD') {
+              const newResources = Object.assign({}, this.state.resources)
+              newResources[hash] = dag.value.thread
+              this.setState({resources: newResources})
+            }
           })
-
-          // node.files.cat(hash, (err, stream) => {
-          //   if (err) throw err
-          //   const data = []
-          //   stream.on('data', (d) => {
-          //     data.push(d)
-          //   })
-          //   stream.on('end', () => {
-          //     const parsedData = JSON.parse(data.join(''))
-          //     if (parsedData.from.id !== msg.from) {
-          //       console.warn('throw away message, its fake')
-          //       console.log(msg, parsedData)
-          //     } else {
-          //       parsedData.hash = hash
-          //       if (parsedData.threads && !isFromThisNode) { // it's a users collection of threads
-          //         parsedData.threads.forEach((t) => {
-          //           node.files.cat(t, (err, stream) => {
-          //             if (err) throw err
-          //             const data = []
-          //             stream.on('data', (d) => {
-          //               data.push(d)
-          //             })
-          //             stream.on('end', () => {
-          //               const parsedData = JSON.parse(data.join(''))
-          //               parsedData.hash = t
-          //               this.setState({
-          //                 threads: _.uniqBy(this.state.threads.concat(parsedData), 'hash')
-          //               })
-          //             })
-          //           })
-          //         })
-          //       }
-          //       if (parsedData.posts && !isFromThisNode) { // it's a users collection of posts
-          //         const promises = parsedData.posts.map((p) => {
-          //           return new Promise((resolve, reject) => {
-          //             node.files.cat(p, (err, stream) => {
-          //               if (err) reject(err)
-          //               const data = []
-          //               stream.on('data', (d) => {
-          //                 data.push(d)
-          //               })
-          //               stream.on('end', () => {
-          //                 const parsedData = JSON.parse(data.join(''))
-          //                 parsedData.hash = p
-          //                 resolve(parsedData)
-          //               })
-          //             })
-          //           })
-          //         })
-          //         Promise.all(promises).then((posts) => {
-          //           this.setState({
-          //             posts: _.uniqBy(this.state.posts.concat(posts), 'hash')
-          //           })
-          //         })
-          //         return
-          //       }
-          //       if (parsedData.subject) { // it's a thread
-          //         this.setState({
-          //           threads: _.uniqBy(this.state.threads.concat([parsedData]), 'hash')
-          //         })
-          //         return
-          //       }
-          //       if (parsedData.threadID) { // it's a post
-          //         this.setState({
-          //           posts: this.state.posts.concat([parsedData])
-          //         })
-          //       }
-          //     }
-          //   })
-          // })
         })
 
-        // const peersAtLeastOne = this.state.numberOfPeers === 0 ? 1 : this.state.numberOfPeers
-        // const publishTimeout = 1000 * peersAtLeastOne
-
-        // const publishThreads = () => {
-        //   console.log('publishing threads')
-        //   if (this.state.threads.length > 0) {
-        //     const myID = getIDFromNode(node)
-        //     // TODO only post users threads or all posts???
-        //     // const threadsToPost = this.state.threads.filter(t => myID === t.from.id)
-        //     const threadsToPost = this.state.threads
-        //     const msg = {
-        //       threads: threadsToPost.map(t => t.hash),
-        //       from: {id: myID}
-        //     }
-        //     const msgToSend = new Buffer(JSON.stringify(msg))
-        //     node.files.add(msgToSend, (err, res) => {
-        //       if (err) throw err
-        //       const hash = res[0].hash
-        //       node.pubsub.publish(CHANNEL, new Buffer(hash))
-        //     })
-        //   }
-        //   setTimeout(() => { // publish list of threads
-        //     publishThreads()
-        //   }, publishTimeout)
-        // }
-        // publishThreads()
-
-        // const publishPosts = () => {
-        //   console.log('publishing posts')
-        //   if (this.state.posts.length > 0) {
-        //     const myID = getIDFromNode(node)
-        //     // TODO only post users threads or all posts???
-        //     // const threadsToPost = this.state.threads.filter(t => myID === t.from.id)
-        //     const postsToPost = this.state.posts
-        //     const msg = {
-        //       posts: postsToPost.map(p => p.hash),
-        //       from: {id: myID}
-        //     }
-        //     const msgToSend = new Buffer(JSON.stringify(msg))
-        //     node.files.add(msgToSend, (err, res) => {
-        //       if (err) throw err
-        //       const hash = res[0].hash
-        //       node.pubsub.publish(CHANNEL, new Buffer(hash))
-        //     })
-        //   }
-        //   setTimeout(() => { // publish list of threads
-        //     publishPosts()
-        //   }, publishTimeout)
-        // }
+        const publishPosts = () => {
+          if (Object.keys(this.state.resources).length > 0) {
+            // const myID = getIDFromNode(this.props.node)
+            // TODO only post users threads or all posts???
+            // const threadsToPost = this.state.threads.filter(t => myID === t.from.id)
+            const toPublish = Object.assign({}, {hashes: this.state.resources}, {
+              type: 'STATE'
+            })
+            node.dag.put(toPublish, {format: 'dag-cbor'}, (err, dag) => {
+              if (err) throw err
+              const hash = dag.toBaseEncodedString()
+              node.pubsub.publish(CHANNEL, new Buffer(hash))
+            })
+          }
+          setTimeout(() => { // publish list of threads
+            publishPosts()
+          }, 1000)
+        }
+        // TODO don't need to publish all posts from clients right now
         // publishPosts()
 
         setInterval(() => {
@@ -186,23 +103,6 @@ export default class ContainerView extends Component {
             this.setState({peers})
           })
         }, 1000 * 2.5)
-
-        // TODO remove, only for dev
-        // setTimeout(() => {
-        //   const msg = {
-        //     from: {
-        //       id: getIDFromNode(node)
-        //     },
-        //     subject: 'Example Thread',
-        //     body: 'This is just a little example thread!',
-        //     created_at: new Date()
-        //   }
-        //   const msgToSend = new Buffer(JSON.stringify(msg))
-        //   node.files.add(msgToSend, (err, res) => {
-        //     if (err) throw err
-        //     node.pubsub.publish(CHANNEL, new Buffer(res[0].hash))
-        //   })
-        // }, 2000)
       }
     })
   }

@@ -19,14 +19,17 @@ export default class NewThreadView extends Component {
   createThread () {
     this.setState({creating: true})
     const msg = {
-      from: {
-        id: getIDFromNode(this.props.node),
-        username: this.props.username
-      },
-      subject: this.state.currentSubject,
-      body: this.state.currentBody,
-      tags: this.state.currentTags.split(','),
-      created_at: new Date()
+      type: 'THREAD',
+      thread: {
+        from: {
+          id: getIDFromNode(this.props.node),
+          username: this.props.username
+        },
+        subject: this.state.currentSubject,
+        body: this.state.currentBody,
+        tags: this.state.currentTags.split(','),
+        created_at: new Date()
+      }
     }
     console.log('creating thread', msg)
     // const msgToSend = new Buffer(JSON.stringify(msg))

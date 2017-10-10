@@ -24,33 +24,50 @@
  */
 import { createNode, getIDFromNode } from './src/views/utils'
 import { CHANNEL } from './src/constants.js'
+import fs from 'fs'
 console.log('Initializing...')
-const allHashes = {}
+let allHashes = {}
+try {
+  allHashes = require('./.forum-cache/posts.json')
+} catch (err) {
+  console.log('WARNING', err)
+}
 createNode('./.forum-cache', (err, node) => {
-  console.log('Started')
   if (err) throw err
-  setInterval(() => {
-    console.log('Publishing saved hashes')
-    Object.keys(allHashes).forEach((hash) => {
-      node.pubsub.publish(CHANNEL, new Buffer(hash))
-    })
-  }, 2000)
+  const publishPosts = () => {
+    if (Object.keys(allHashes).length > 0) {
+      const toPublish = Object.assign({}, {hashes: allHashes}, {type: 'STATE'})
+      console.log("## PUBLISHING")
+      console.log(toPublish)
+      node.dag.put(toPublish, {format: 'dag-cbor'}, (err, dag) => {
+        if (err) throw err
+        const hash = dag.toBaseEncodedString()
+        node.pubsub.publish(CHANNEL, new Buffer(hash))
+      })
+    }
+    setTimeout(() => { // publish list of threads
+      publishPosts()
+    }, 1000)
+  }
+  publishPosts()
   node.pubsub.subscribe(CHANNEL, (msg) => {
     const hash = msg.data.toString()
-    console.log('Got message')
-
-    if (msg.from === getIDFromNode(node)) {
-      return console.log('from myself, ignoring')
-    }
-
-    console.log(hash)
-    allHashes[hash] = true
-    console.log('Getting DAG')
     node.dag.get(hash, (err, dag) => {
-      console.log(err, dag)
-      node.dag.put(dag.value, {format: 'dag-cbor'}, (err, res) => {
-        console.log(err, res)
-      })
+      if (err) throw err
+      console.log("## Received")
+      console.log(dag)
+      if (dag.value.type === 'STATE') {
+        Object.keys(dag.value.hashes).forEach((key) => {
+          allHashes[key] = dag.value.hashes[key]
+        })
+      }
+      if (dag.value.type === 'COMMENT') {
+        allHashes[hash] = dag.value.comment
+      }
+      if (dag.value.type === 'THREAD') {
+        allHashes[hash] = dag.value.thread
+      }
+      fs.writeFileSync('./.forum-cache/posts.json', JSON.stringify(allHashes))
     })
   })
 })

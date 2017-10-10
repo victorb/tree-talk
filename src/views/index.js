@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { hashHistory, Link } from 'react-router'
 import Tags from './tags.js'
-// import _ from 'lodash'
+import _ from 'lodash'
 
 export default class IndexView extends Component {
   goToThread (thread) {
@@ -11,10 +11,16 @@ export default class IndexView extends Component {
   }
   render () {
     // const posts = _.groupBy(this.props.posts, 'threadID')
-    let threads = Object.keys(this.props.resources).map((key) => {
+    let threads = _.filter(Object.keys(this.props.resources).map((key) => {
       const thread = this.props.resources[key]
+      if (!thread.subject) {
+        return
+      }
       // const thisThreadsPosts = posts[thread.hash]
       let postLen = 0
+      postLen = _.filter(this.props.resources, (r) => {
+        return r.thread && r.thread === key
+      }).length
       // if (thisThreadsPosts) {
       //   postLen = thisThreadsPosts.length
       // }
@@ -23,7 +29,7 @@ export default class IndexView extends Component {
           {thread.subject} (Replies: {postLen}) <Tags tags={thread.tags} onClick={() => {}} />
         </div>
       </div>
-    })
+    }))
     if (threads.length === 0) {
       threads = <div className='column'>Have yet to find any existing threads... Please wait</div>
     }

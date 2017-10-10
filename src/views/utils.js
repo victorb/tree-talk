@@ -39,7 +39,7 @@ export const createNode = (repo, callback) => {
 
   node.on('start', () => {
     // should hardcode to tree-talk signal server
-    node.swarm.connect('/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmWq2ugzXDeTzW9GTYgdo3k6QUDmC1vnZcgjHhWtMxHYct')
+    node.swarm.connect('/dns/tree-talk.io/tcp/4003/ws/ipfs/QmR61SucnaVrrhsYURcQVWEkMK46tfRhUqGX2CfRsoqWCk')
     console.log('node started')
     //node.config.get((err, config) => {
     //  if (err) return callback(err)
